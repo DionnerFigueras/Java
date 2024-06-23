@@ -1,0 +1,16 @@
+Tarea no. 2. Java RMI
+
+Esta tarea es un trabajo ya realizado por Chautruonglong 
+Se trata de un  escritorio remoto usando java, Java rmi, tcp. Se implementan  funciones como servidor remoto, mouse y teclado remotos del servidor, lectura de hardware del servidor, chat, envío de archivos.
+Implementen su versión de este código y añada una funcionalidad. ( Por ejemplo, monitor de rendimiento)
+
+Link del GitHub: https://github.com/chautruonglong/Remote-Desktop
+Link del repositorio: https://github.com/chautruonglong/Remote-Desktop.git 
+
+Entregar:
+
+1. Informe con el Código documentado en una plataforma colaborativa. 
+
+2. Puede usar las plataforma Notebook de Jupyter,  R Markdow. O también otra plataforma colaborativa.
+
+3. Video con ejecucion incluído en el cuaderno. Pueden hacer videos por secciones de codigo
