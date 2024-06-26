@@ -1,12 +1,15 @@
 package gui.client;
 
+public class Copy {
+
+}
+
+/*
+ * package gui.client;
+
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -18,7 +21,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import BUS.COMMON.CommonBus;
@@ -55,125 +57,28 @@ public class ClientPanel extends JPanel {
         highQualityRadio = new JRadioButton("High quality");
         loaderLabel = new JLabel();
 
-        GridBagLayout gridBagLayout = new GridBagLayout();
-        GridBagConstraints gbc = new GridBagConstraints();
-        this.setLayout(gridBagLayout);
-
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
-        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
-
-        // Create input panel
-        JPanel inputPanel = new JPanel(new GridBagLayout());
-        inputPanel.setBorder(BorderFactory.createTitledBorder(null, "Connect To Server",
+        mainPanel.setBorder(BorderFactory.createTitledBorder(null, "Connect to Server",
             TitledBorder.DEFAULT_JUSTIFICATION,
             TitledBorder.DEFAULT_POSITION,
             new Font("segoe ui", Font.BOLD, 16),
-            Color.decode(ClientPanel.FOREGROUND_COLOR)));
+            Color.decode(ClientPanel.FOREGROUND_COLOR))
+        );
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.LINE_END;
-        mainPanel.getServerLabel().setText("Remote IP");
-        //inputPanel.add(new JLabel("Remote IP:"), gbc);
-        inputPanel.add(mainPanel.getServerLabel(), gbc);
-        
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.LINE_START;
-        //JTextField remoteIPField = new JTextField(20);
-        //inputPanel.add(remoteIPField, gbc);
+        mainPanel.getServerLabel().setText("Remote IP:");
         mainPanel.getServerField().setVisible(true);
-        inputPanel.add(mainPanel.getServerField(), gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.LINE_END;
-        mainPanel.getPortLabel().setText("Remote Port:");
-        inputPanel.add(mainPanel.getPortLabel(), gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.LINE_START;
-        //JTextField remotePortField = new JTextField(20);
-        //inputPanel.add(remotePortField, gbc);
         mainPanel.getPortField().setVisible(true);
-        inputPanel.add(mainPanel.getPortField(), gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.anchor = GridBagConstraints.LINE_END;
-        //inputPanel.add(new JLabel("Password:"), gbc);
+        mainPanel.getPortLabel().setText("Remote port:");
         mainPanel.getPasswordLabel().setText("Password:");
-        inputPanel.add(mainPanel.getPasswordLabel(), gbc);
-
-
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.anchor = GridBagConstraints.LINE_START;
-        //JTextField passwordField = new JTextField(20);
-        //inputPanel.add(passwordField, gbc);
+        mainPanel.getPasswordField().setVisible(false);
         mainPanel.getPasswordField().setVisible(true);
-        inputPanel.add(mainPanel.getPasswordField(), gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.CENTER;
-        inputPanel.add(new JLabel("<html>>>Help: Enter a name or an IP address and port of server which you want to remote.<br>>>Example: 192.168.0.1:9999</html>"), gbc);
+        mainPanel.getHelpLabel().setText("<html>>>Help: Enter a name or an IP address and port of server which you want to remote.<br>>>Example: 192.168.0.1:9999</html>");
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.CENTER;
-        this.add(inputPanel, gbc);
-
-        // Create quality panel
-        JPanel qualityPanel = new JPanel(new GridBagLayout());
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.CENTER;
-        this.add(qualityPanel, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.LINE_START;
-        lowQualityRadio.setFont(new Font("segoe ui", Font.PLAIN, 15));
-        lowQualityRadio.setSelected(true);
-        qualityPanel.add(lowQualityRadio, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.LINE_START;
-        highQualityRadio.setFont(new Font("segoe ui", Font.PLAIN, 15));
-        qualityPanel.add(highQualityRadio, gbc);
-
-        lowQualityRadio.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    highQualityRadio.setSelected(false);
-                }
-            }
-        });
-        
-        highQualityRadio.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    lowQualityRadio.setSelected(false);
-                }
-            }
-        });
-
-        // Create connect button
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.CENTER;
-       connectLabel.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("IMAGES/connect_icon.png")));
+        connectLabel.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("IMAGES/connect_icon.png")));
         connectLabel.setText("Connect now");
+        connectLabel.setBounds(220, 290, 150, 50);
+        connectLabel.setForeground(Color.decode(FOREGROUND_COLOR));
         connectLabel.setFont(new Font("segoe ui", Font.PLAIN, 15));
         connectLabel.addMouseListener(new MouseAdapter() {
             
@@ -182,14 +87,32 @@ public class ClientPanel extends JPanel {
                 connectLabelMousePressed(e);
             }
         });
-        this.add(connectLabel, gbc);
 
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.anchor = GridBagConstraints.LINE_START;
+        lowQualityRadio.setBounds(60, 290, 100, 30);
+        lowQualityRadio.setOpaque(false);
+        lowQualityRadio.setSelected(true);
+        qualityGroup.add(lowQualityRadio);
+
+        highQualityRadio.setBounds(60, 310, 100, 30);
+        highQualityRadio.setOpaque(false);
+        qualityGroup.add(highQualityRadio);
+
         loaderLabel.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("IMAGES/loader_icon.gif")));
+        loaderLabel.setBounds(340, 307, 16, 16);
         loaderLabel.setVisible(false);
-        this.add(loaderLabel, gbc);
+
+        
+        this.add(mainPanel.getServerLabel());
+        this.add(mainPanel.getServerField());
+        this.add(mainPanel.getPortLabel());
+        this.add(mainPanel.getPortField());
+        this.add(mainPanel.getPasswordLabel());
+        this.add(mainPanel.getPasswordField());
+        this.add(mainPanel.getHelpLabel());
+        this.add(connectLabel);
+        this.add(lowQualityRadio);
+        this.add(highQualityRadio);
+        this.add(loaderLabel);
     }
 
     @Override
@@ -215,9 +138,9 @@ public class ClientPanel extends JPanel {
 
             Thread connectThread = new Thread(() -> {
                 try {
-                    String host = ((JTextField) mainPanel.getComponent(1)).getText().trim();
-                    int port = Integer.parseInt(((JTextField) mainPanel.getComponent(3)).getText().trim());
-                    String password = ((JTextField) mainPanel.getComponent(5)).getText().trim();
+                    String host = mainPanel.getServerField().getText().trim();
+                    int port = Integer.parseInt(mainPanel.getPortField().getText().trim());
+                    String password = mainPanel.getPasswordLabel().getText().trim();
 
                     if (!isValidIpv4(host)) throw new Exception("Wrong format IPV4");
 
@@ -262,3 +185,4 @@ public class ClientPanel extends JPanel {
     frame.setVisible(true);
 }
 }
+ */

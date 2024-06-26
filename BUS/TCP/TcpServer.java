@@ -53,7 +53,7 @@ public class TcpServer {
         }
     }
 
-    private void acceptConnections() {
+    public void acceptConnections() {
         while (isListening.get()) {
             try {
                 clientSocket = serverSocket.accept();

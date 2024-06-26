@@ -33,12 +33,12 @@ public class CommonPanel extends JPanel {
     }
 
     private void initComponents() {
-        serverLabel = new JLabel("Server IP/Name:");
+        serverLabel = new JLabel("Server IP:");
         serverLabel.setBounds(30, 30, 100, 30);
         serverLabel.setFont(new Font("segoe ui", Font.BOLD, 14));
         add(serverLabel);
 
-        serverField = new JTextField();
+        serverField = new JTextField(20);
         serverField.setBounds(140, 35, 130, 20);
         add(serverField);
 

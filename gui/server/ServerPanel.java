@@ -6,11 +6,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import BUS.COMMON.CommonBus;
+import gui.MainFrame;
 import gui.client.ClientPanel;
 import gui.common.CommonLabel;
 import gui.common.CommonPanel;
@@ -30,6 +32,10 @@ public class ServerPanel extends JPanel implements Runnable {
 
     public ServerPanel(CommonBus remote_desktop_bus) {
         
+        this.setLocation(0, MainFrame.HEIGHT_TASKBAR);
+        this.setSize(MainFrame.WIDTH, MainFrame.HEIGHT - MainFrame.HEIGHT_TASKBAR);
+        this.setBackground(Color.decode(ClientPanel.BACKGROUND_COLOR));
+        this.setLayout(null);
         this.remote_desktop_bus = remote_desktop_bus;
         
         this.initComponents();
@@ -69,6 +75,10 @@ public class ServerPanel extends JPanel implements Runnable {
             }
         });
         this.add(this.disconnect_label);
+
+        
+        this.main_panel.setBounds(50, 50, 300, 200);
+        this.add(this.main_panel);
     }
 
     private void connectLabelMousePressed(MouseEvent e) {
@@ -76,7 +86,7 @@ public class ServerPanel extends JPanel implements Runnable {
             try {
                 String host = this.main_panel.getServerField().getText().toString();
                 int port = Integer.parseInt(this.main_panel.getPortField().getText().trim());
-                String password = this.main_panel.getPasswordField().toString();
+                String password = this.main_panel.getPasswordField().getPassword().toString();
                 this.remote_desktop_bus.startServer(host, port, password);
 
                 
@@ -126,4 +136,22 @@ public class ServerPanel extends JPanel implements Runnable {
             }
         }
     }
+
+public static void main(String[] args) {
+    // Crear un objeto CommonBus para pasar como parámetro
+    CommonBus remoteDesktopBus = new CommonBus();
+
+    // Crear un objeto JFrame para contener el panel
+    JFrame frame = new JFrame("Remote Desktop Server");
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+    // Crear un objeto ServerPanel y agregarlo al frame
+    ServerPanel serverPanel = new ServerPanel(remoteDesktopBus);
+    frame.getContentPane().add(serverPanel);
+
+    // Configurar el tamaño y la visibilidad del frame
+    frame.setSize(400, 400);
+    frame.setVisible(true);
+}
+
 }

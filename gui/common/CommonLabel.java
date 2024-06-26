@@ -7,7 +7,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.JLabel;
 
 public class CommonLabel extends JLabel {
-    public final static String HIGHLIGHT_COLOR = "0xFFC107";
+    public final static String HIGHLIGHT_COLOR = "0x646464";
     public final static int NORMAL_FONT_SIZE = 18;
     public final static int HIGHLIGHT_FONT_SIZE = 20;
 

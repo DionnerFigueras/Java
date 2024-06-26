@@ -1,201 +1,153 @@
-/*
- * package GUI;
+/* package gui.server;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.rmi.NotBoundException;
+import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.Timer;
-import javax.swing.UIManager;
 
 import BUS.COMMON.CommonBus;
-import GUI.chat.MainChatPanel;
-import GUI.client.ClientPanel;
-import GUI.common.CommonLabel;
-import GUI.server.ServerPanel;
+import gui.MainFrame;
+import gui.client.ClientPanel;
+import gui.common.CommonLabel;
+import gui.common.CommonPanel;
 
-public class MainFrame extends JFrame {
-    public final static int WIDTH_FRAME = 400;
-    public final static int HEIGHT_FRAME = 420;
-    public final static int HEIGHT_TASKBAR = 50;
-    public final static String TASKBAR_BACKGROUND = "0x000942";
+public class ServerPanel extends JPanel implements Runnable {
+    public final static String CONNECTED_FOREGROUND = "0x008000";
+    public final static String DISCONNECTED_FOREGROUND = "0x0042A7";
 
-    private CommonBus commonBus;
-    private JPanel taskbarPanel;
-    private CommonLabel clientLabel;
-    private CommonLabel serverLabel;
-    private CommonLabel chatLabel;
-    private ClientPanel clientPanel;
-    private ServerPanel serverPanel;
-    private MainChatPanel mainChatPanel;
-    private int focusKey;
+    private CommonPanel main_panel;
+    private JLabel status_label;
+    private CommonLabel connect_label;
+    private CommonLabel disconnect_label;
 
-    public MainFrame() throws IOException {
-        ImageIO.setUseCache(false);
+    private CommonBus remote_desktop_bus;
 
-        UIManager.put("Label.disabledForeground", Color.decode("0xD3D3D3"));
-        UIManager.put("RadioButton.disabledText", Color.decode("0xD3D3D3"));
+    private Thread connection_thread;
 
-        initUI();
-    }
+    public ServerPanel(CommonBus remote_desktop_bus) {
+        
+        this.setLocation(0, MainFrame.HEIGHT_TASKBAR);
+        this.setSize(MainFrame.WIDTH, MainFrame.HEIGHT - MainFrame.HEIGHT_TASKBAR);
+        this.setBackground(Color.decode(ClientPanel.BACKGROUND_COLOR));
 
-    private void initUI() {
-        setPreferredSize(new Dimension(WIDTH_FRAME, HEIGHT_FRAME));
-        pack();
-        setLayout(new BorderLayout());
-        setLocationRelativeTo(null);
-        setResizable(false);
-        setTitle("Remote Desktop Software");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setIconImage(new ImageIcon(getClass().getClassLoader().getResource("window_icon.png")).getImage());
-        setVisible(true);
-
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                try {
-                    mainFrameWindowClosing(e);
-                } catch (Exception exception) {
-                }
-            }
-        });
-
-        initComponents();
+        this.remote_desktop_bus = remote_desktop_bus;
+        
+        this.initComponents();
     }
 
     private void initComponents() {
-        commonBus = new CommonBus();
-        taskbarPanel = new JPanel();
-        clientLabel = new CommonLabel();
-        serverLabel = new CommonLabel();
-        chatLabel = new CommonLabel();
-        clientPanel = new ClientPanel(commonBus);
-        serverPanel = new ServerPanel(commonBus);
-        mainChatPanel = new MainChatPanel(commonBus);
+        
+        this.main_panel = new CommonPanel();
+        this.status_label = new JLabel();
+        this.connect_label = new CommonLabel();
+        this.disconnect_label = new CommonLabel();
 
-        commonBus.setMainChatPanel(mainChatPanel);
-
-        focusKey = 1;
-
-        taskbarPanel.setLayout(new GridLayout(1, 3));
-        taskbarPanel.setBackground(Color.decode(TASKBAR_BACKGROUND));
-        taskbarPanel.setBounds(0, 0, WIDTH_FRAME, HEIGHT_TASKBAR);
-        add(taskbarPanel, BorderLayout.NORTH);
-
-        clientLabel.setText("Client");
-        clientLabel.setHighlightFont();
-        clientLabel.addMouseListener(new TabLabelMouseListener(clientLabel, 1));
-        taskbarPanel.add(clientLabel);
-
-        serverLabel.setText("Server");
-        serverLabel.addMouseListener(new TabLabelMouseListener(serverLabel, 2));
-        taskbarPanel.add(serverLabel);
-
-        chatLabel.setText("Chat");
-        chatLabel.addMouseListener(new TabLabelMouseListener(chatLabel, 3));
-        taskbarPanel.add(chatLabel);
-
-        clientPanel.setVisible(true);
-        serverPanel.setVisible(false);
-        mainChatPanel.setVisible(false);
-        add(clientPanel, BorderLayout.CENTER);
-        add(serverPanel, BorderLayout.CENTER);
-        add(mainChatPanel, BorderLayout.CENTER);
-    }
-
-    private void mainFrameWindowClosing(WindowEvent e) throws IOException, NotBoundException {
-        commonBus.stopServer();
-    }
-
-    private class TabLabelMouseListener extends MouseAdapter {
-        private CommonLabel label;
-        private int key;
-
-        public TabLabelMouseListener(CommonLabel label, int key) {
-            this.label = label;
-            this.key = key;
-        }
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            if (e.getButton() == MouseEvent.BUTTON1) {
-                if (key == focusKey)
-                    return;
-                JPanel showPanel = getPanel(key);
-                JPanel hidePanel = getPanel(focusKey);
-                boolean isLeft = key > focusKey;
-                showPanelsSlider(showPanel, hidePanel, isLeft);
-                label.setText("");
-                focusKey = key;
-                updateLabels();
+        
+        this.connect_label.setText("Connect");
+        this.connect_label.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("IMAGES/connect_icon.png")));
+        this.connect_label.setBounds(50, 290, 150, 50);
+        this.connect_label.setForeground(Color.decode(ClientPanel.FOREGROUND_COLOR));
+        this.connect_label.setFont(new Font("segoe ui", Font.PLAIN, 15));
+        this.connect_label.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                connectLabelMousePressed(e);
             }
-        }
-    }
-
-    private JPanel getPanel(int key) {
-        switch (key) {
-            case 1:
-                return clientPanel;
-            case 2:
-                return serverPanel;
-            case 3:
-                return mainChatPanel;
-            default:
-                return null;
-        }
-    }
-
-    private void updateLabels() {
-        clientLabel.setNormalFont();
-        serverLabel.setNormalFont();
-        chatLabel.setNormalFont();
-        switch (focusKey) {
-            case 1:
-                clientLabel.setHighlightFont();
-                break;
-            case 2:
-                serverLabel.setHighlightFont();
-                break;
-            case 3:
-                chatLabel.setHighlightFont();
-                break;
-        }
-    }
-
-    private void showPanelsSlider(JPanel showPanel, JPanel hidePanel, boolean isLeft) {
-        showPanel.setVisible(true);
-
-        int xHideLocation = 0;
-        int xShowLocation = isLeft ? WIDTH_FRAME : -WIDTH_FRAME;
-        int value = isLeft ? -50 : 50;
-
-        @SuppressWarnings("unused")
-        Timer timer = new Timer(10, e -> {
-            int tempxHideLocation = xHideLocation;
-            int tempxShowLocation = xShowLocation;
-            hidePanel.setLocation(xHideLocation, HEIGHT_TASKBAR);
-            showPanel.setLocation(xShowLocation, HEIGHT_TASKBAR);
-            if (xShowLocation == 0) {
-                ((Timer) e.getSource()).stop();
-                hidePanel.setVisible(false);
-            }
-
-            tempxHideLocation += value;
-            tempxShowLocation += value;
         });
-        timer.start();
+        this.add(this.connect_label);
+
+        this.disconnect_label.setText("Disconnect");
+        this.disconnect_label.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("IMAGES/connect_icon.png")));
+        this.disconnect_label.setBounds(220, 290, 150, 50);
+        this.disconnect_label.setForeground(Color.decode(ClientPanel.FOREGROUND_COLOR));
+        this.disconnect_label.setFont(new Font("segoe ui", Font.PLAIN, 15));
+        this.disconnect_label.setEnabled(false);
+        this.disconnect_label.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                disconnectLabelMousePressed(e);
+            }
+        });
+        this.add(this.disconnect_label);
     }
+
+    private void connectLabelMousePressed(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1 && this.connect_label.isEnabled()) {
+            try {
+                String host = this.main_panel.getServerField().getText().toString();
+                int port = Integer.parseInt(this.main_panel.getPortField().getText().trim());
+                String password = this.main_panel.getPasswordField().toString();
+                this.remote_desktop_bus.startServer(host, port, password);
+
+                
+                this.connection_thread = new Thread(this);
+                this.connection_thread.setDaemon(true);
+                this.connection_thread.start();
+
+                
+                this.main_panel.setEnabled(false);
+                this.connect_label.setNormalFont();
+                this.connect_label.setEnabled(false);
+                this.disconnect_label.setEnabled(true);
+                this.status_label.setText("Status: Connected");
+                this.status_label.setForeground(Color.decode(ServerPanel.CONNECTED_FOREGROUND));
+            } catch (Exception exception) {
+                JOptionPane.showMessageDialog(this, "Can't connect to remote desktop:\n" + exception.getMessage());
+            }
+        }
+    }
+
+    private void disconnectLabelMousePressed(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1 && this.disconnect_label.isEnabled()) {
+            try {
+                this.remote_desktop_bus.stopServer();
+
+                this.connection_thread.interrupt();
+
+                this.main_panel.setEnabled(true);
+                this.disconnect_label.setNormalFont();
+                this.disconnect_label.setEnabled(false);
+                this.connect_label.setEnabled(true);
+                this.status_label.setText("Status: Disconnected");
+                this.status_label.setForeground(Color.decode(ServerPanel.DISCONNECTED_FOREGROUND));
+            } catch (Exception exception) {
+                System.out.println(exception.getMessage());
+                JOptionPane.showMessageDialog(this, "Can't disconnect from remote desktop:\n" + exception.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public void run() {
+        while (this.remote_desktop_bus.getTcpServer().isListening()) {
+            try {
+                this.remote_desktop_bus.getTcpServer();
+            } catch (Exception e) {
+            }
+        }
+    }
+
+public static void main(String[] args) {
+    // Crear un objeto CommonBus para pasar como parámetro
+    CommonBus remoteDesktopBus = new CommonBus();
+
+    // Crear un objeto JFrame para contener el panel
+    JFrame frame = new JFrame("Remote Desktop Server");
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+    // Crear un objeto ServerPanel y agregarlo al frame
+    ServerPanel serverPanel = new ServerPanel(remoteDesktopBus);
+    frame.getContentPane().add(serverPanel);
+
+    // Configurar el tamaño y la visibilidad del frame
+    frame.setSize(400, 400);
+    frame.setVisible(true);
 }
 
- */
+} */
