@@ -35,7 +35,7 @@ public class ServerPanel extends JPanel implements Runnable {
         this.setLocation(0, MainFrame.HEIGHT_TASKBAR);
         this.setSize(MainFrame.WIDTH, MainFrame.HEIGHT - MainFrame.HEIGHT_TASKBAR);
         this.setBackground(Color.decode(ClientPanel.BACKGROUND_COLOR));
-
+        this.setLayout(null);
         this.remote_desktop_bus = remote_desktop_bus;
         
         this.initComponents();
@@ -75,6 +75,10 @@ public class ServerPanel extends JPanel implements Runnable {
             }
         });
         this.add(this.disconnect_label);
+
+        
+        this.main_panel.setBounds(50, 50, 300, 200);
+        this.add(this.main_panel);
     }
 
     private void connectLabelMousePressed(MouseEvent e) {
@@ -82,7 +86,7 @@ public class ServerPanel extends JPanel implements Runnable {
             try {
                 String host = this.main_panel.getServerField().getText().toString();
                 int port = Integer.parseInt(this.main_panel.getPortField().getText().trim());
-                String password = this.main_panel.getPasswordField().toString();
+                String password = this.main_panel.getPasswordField().getPassword().toString();
                 this.remote_desktop_bus.startServer(host, port, password);
 
                 

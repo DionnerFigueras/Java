@@ -22,6 +22,12 @@ public class MainChatPanel extends JPanel {
 
     private int count;
 
+    public MainChatPanel(){
+        this.chatPanels = new ArrayList<>();
+
+        initUI();
+    }
+
     public MainChatPanel(CommonBus commonBus) {
         this.commonBus = commonBus;
         this.chatPanels = new ArrayList<>();

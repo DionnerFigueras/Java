@@ -20,6 +20,7 @@ import gui.common.CommonPanel;
 public class ServerPanel extends JPanel implements Runnable {
     public final static String CONNECTED_FOREGROUND = "0x008000";
     public final static String DISCONNECTED_FOREGROUND = "0x0042A7";
+    public final static String PANEL_BACKGROUND = "0xEEEEEE";
 
     private CommonPanel main_panel;
     private JLabel status_label;
@@ -31,26 +32,28 @@ public class ServerPanel extends JPanel implements Runnable {
     private Thread connection_thread;
 
     public ServerPanel(CommonBus remote_desktop_bus) {
-        
+
         this.setLocation(0, MainFrame.HEIGHT_TASKBAR);
         this.setSize(MainFrame.WIDTH, MainFrame.HEIGHT - MainFrame.HEIGHT_TASKBAR);
         this.setBackground(Color.decode(ClientPanel.BACKGROUND_COLOR));
         this.setLayout(null);
         this.remote_desktop_bus = remote_desktop_bus;
-        
+
         this.initComponents();
     }
 
     private void initComponents() {
-        
+
         this.main_panel = new CommonPanel();
+        this.main_panel.setBackground(Color.decode(ServerPanel.PANEL_BACKGROUND)); // Fondo gris para el panel principal
+
         this.status_label = new JLabel();
         this.connect_label = new CommonLabel();
         this.disconnect_label = new CommonLabel();
 
-        
         this.connect_label.setText("Connect");
-        this.connect_label.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("IMAGES/connect_icon.png")));
+        this.connect_label
+                .setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("IMAGES/connect_icon.png")));
         this.connect_label.setBounds(50, 290, 150, 50);
         this.connect_label.setForeground(Color.decode(ClientPanel.FOREGROUND_COLOR));
         this.connect_label.setFont(new Font("segoe ui", Font.PLAIN, 15));
@@ -63,7 +66,8 @@ public class ServerPanel extends JPanel implements Runnable {
         this.add(this.connect_label);
 
         this.disconnect_label.setText("Disconnect");
-        this.disconnect_label.setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("IMAGES/connect_icon.png")));
+        this.disconnect_label
+                .setIcon(new ImageIcon(this.getClass().getClassLoader().getResource("IMAGES/connect_icon.png")));
         this.disconnect_label.setBounds(220, 290, 150, 50);
         this.disconnect_label.setForeground(Color.decode(ClientPanel.FOREGROUND_COLOR));
         this.disconnect_label.setFont(new Font("segoe ui", Font.PLAIN, 15));
@@ -76,7 +80,6 @@ public class ServerPanel extends JPanel implements Runnable {
         });
         this.add(this.disconnect_label);
 
-        
         this.main_panel.setBounds(50, 50, 300, 200);
         this.add(this.main_panel);
     }
@@ -86,15 +89,15 @@ public class ServerPanel extends JPanel implements Runnable {
             try {
                 String host = this.main_panel.getServerField().getText().toString();
                 int port = Integer.parseInt(this.main_panel.getPortField().getText().trim());
-                String password = this.main_panel.getPasswordField().getPassword().toString();
+                char[] passwordChar = this.main_panel.getPasswordField().getPassword();
+                String password = new String(passwordChar);
+
                 this.remote_desktop_bus.startServer(host, port, password);
 
-                
                 this.connection_thread = new Thread(this);
                 this.connection_thread.setDaemon(true);
                 this.connection_thread.start();
-
-                
+                System.out.println("Conected");
                 this.main_panel.setEnabled(false);
                 this.connect_label.setNormalFont();
                 this.connect_label.setEnabled(false);
@@ -137,21 +140,24 @@ public class ServerPanel extends JPanel implements Runnable {
         }
     }
 
-public static void main(String[] args) {
-    // Crear un objeto CommonBus para pasar como parámetro
-    CommonBus remoteDesktopBus = new CommonBus();
+    public static void main(String[] args) {
+        // Crear un objeto CommonBus para pasar como parámetro
+        CommonBus remoteDesktopBus = new CommonBus();
 
-    // Crear un objeto JFrame para contener el panel
-    JFrame frame = new JFrame("Remote Desktop Server");
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // Crear un objeto JFrame para contener el panel
+        JFrame frame = new JFrame("Remote Desktop Server");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-    // Crear un objeto ServerPanel y agregarlo al frame
-    ServerPanel serverPanel = new ServerPanel(remoteDesktopBus);
-    frame.getContentPane().add(serverPanel);
+        // Crear un objeto ServerPanel y agregarlo al frame
+        ServerPanel serverPanel = new ServerPanel(remoteDesktopBus);
+        frame.getContentPane().add(serverPanel);
 
-    // Configurar el tamaño y la visibilidad del frame
-    frame.setSize(400, 400);
-    frame.setVisible(true);
+        // Configurar el tamaño y la visibilidad del frame
+        frame.setSize(400, 400);
+        frame.setVisible(true);
+    
+    }
+
 }
 
-}
+/* */
